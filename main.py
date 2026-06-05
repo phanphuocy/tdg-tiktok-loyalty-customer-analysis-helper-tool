@@ -215,6 +215,65 @@ total_customers_loyalty = cursor.fetchall()
 print(f"Successfully added {len(total_customers_loyalty)} rows into 'total_customers_loyalty' table!")
 
 
+#
+cursor.execute("DROP TABLE IF EXISTS monthly_customers_data;")
+cursor.execute(
+    """
+    CREATE TABLE monthly_customers_data AS
+    WITH customer_aggregates AS (
+        SELECT 
+            SUBSTR(Order_Time, 1, 7) AS Order_Month, -- Extracts YYYY-MM
+            Buyer_Username,
+            COUNT(Order_ID) AS Num_of_Orders,
+            COUNT(CASE WHEN Order_Status = 'Đã hủy' THEN 1 END) AS Num_of_Canceled_Orders,
+            MIN(Order_Time) AS First_Seen,
+            MAX(Order_Time) AS Last_Seen,
+            (JULIANDAY(MAX(Order_Time)) - JULIANDAY(MIN(Order_Time))) AS Retention_Time_Period,
+            SUM(Order_Amount) AS Total_Customer_Spending,
+            SUM(Sum_SKU_Subtotal_After_Discount) AS Merchandise_Value,
+            SUM(Order_Amount) / COUNT(Order_ID) AS Average_Purchase_Value,
+            SUM(Basket_Num_Kinka_Products) AS Basket_Num_Kinka_Products,
+            SUM(Basket_Num_Revy_Products) AS Basket_Num_Revy_Products,
+            SUM(Basket_Num_SiMee_Products) AS Basket_Num_SiMee_Products,
+            SUM(Basket_Num_Medical_Products) AS Basket_Num_Medical_Products,
+            SUM(Basket_Num_IONCare_Products) AS Basket_Num_IONCare_Products,
+            SUM(Basket_Num_Kinka_Products) + SUM(Basket_Num_Revy_Products) + SUM(Basket_Num_SiMee_Products) + SUM(Basket_Num_Medical_Products) + SUM(Basket_Num_IONCare_Products) AS Basket_Total_Num_Products,
+            ROUND(((SUM(Basket_Num_Kinka_Products) + SUM(Basket_Num_Revy_Products) + SUM(Basket_Num_SiMee_Products) + SUM(Basket_Num_Medical_Products) + SUM(Basket_Num_IONCare_Products)) * 100.0 / COUNT(Order_ID)) / 100, 2) AS Avg_Basket_Size,
+            SUM(Basket_Kinka_Spend_Amnt) AS Basket_Kinka_Spend_Amnt,
+            SUM(Basket_Revy_Spend_Amnt) AS Basket_Revy_Spend_Amnt,
+            SUM(Basket_SiMee_Spend_Amnt) AS Basket_SiMee_Spend_Amnt,
+            SUM(Basket_Medical_Spend_Amnt) AS Basket_Medical_Spend_Amnt,
+            SUM(Basket_IONCare_Spend_Amnt) AS Basket_IONCare_Spend_Amnt,
+            SUM(Basket_Total_Kinka_Packsize) AS Basket_Total_Kinka_Packsize,
+            SUM(Basket_Total_Revy_Packsize) AS Basket_Total_Revy_Packsize,
+            SUM(Basket_Total_SiMee_Packsize) AS Basket_Total_SiMee_Packsize,
+            SUM(Basket_Total_Medical_Packsize) AS Basket_Total_Medical_Packsize,
+            SUM(Basket_Total_IONCare_Packsize) AS Basket_Total_IONCare_Packsize
+        FROM total_orders_data
+        GROUP BY Order_Month, Buyer_Username
+    )
+    SELECT 
+        *,
+        ROUND(Basket_Num_Kinka_Products * 100.0 / NULLIF(Basket_Total_Num_Products, 0), 2) AS Basket_Pct_Kinka_Products,
+        ROUND(Basket_Num_Revy_Products * 100.0 / NULLIF(Basket_Total_Num_Products, 0), 2) AS Basket_Pct_Revy_Products,
+        ROUND(Basket_Num_SiMee_Products * 100.0 / NULLIF(Basket_Total_Num_Products, 0), 2) AS Basket_Pct_SiMee_Products,
+        ROUND(Basket_Num_Medical_Products * 100.0 / NULLIF(Basket_Total_Num_Products, 0), 2) AS Basket_Pct_Medical_Products,
+        ROUND(Basket_Num_IONCare_Products * 100.0 / NULLIF(Basket_Total_Num_Products, 0), 2) AS Basket_Pct_IONCare_Products,
+        CASE 
+            WHEN Num_of_Orders >= 1 AND Total_Customer_Spending = 0 THEN 'Affiliator'
+            WHEN (Num_Of_Orders - Num_of_Canceled_Orders = 0) THEN 'Canceled/No Purchases'
+            WHEN Retention_Time_Period < 0.0208 AND Num_Of_Orders >= 2 AND (Num_Of_Orders - Num_of_Canceled_Orders >= 1) AND Num_of_Canceled_Orders != 0 THEN 'Confused One-Time Buyer'
+            WHEN Num_of_Orders >= 2 THEN 'Regular / Loyal'
+            WHEN Num_of_Orders = 1 THEN 'One-Time Buyer'
+            ELSE 'Unsorted'
+        END AS Loyalty_Tier
+    FROM customer_aggregates;
+    """
+)
+cursor.execute("SELECT * FROM monthly_customers_data")
+monthly_customers_data = cursor.fetchall()
+print(f"Successfully added {len(monthly_customers_data)} rows into 'monthly_customers_data' table!")
+
 # 7. Commit changes and close the connection
 conn.commit()
 conn.close()
