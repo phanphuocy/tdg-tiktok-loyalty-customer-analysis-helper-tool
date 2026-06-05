@@ -146,6 +146,11 @@ WITH customer_loyalty_aggregates AS (
 		SUM(Basket_Num_SiMee_Products) AS Basket_Num_SiMee_Products,
 		SUM(Basket_Num_Medical_Products) AS Basket_Num_Medical_Products,
 		SUM(Basket_Num_IONCare_Products) AS Basket_Num_IONCare_Products,
+		SUM(Basket_Kinka_Spend_Amnt) AS Basket_Kinka_Spend_Amnt,
+		SUM(Basket_Revy_Spend_Amnt) AS Basket_Revy_Spend_Amnt,
+		SUM(Basket_SiMee_Spend_Amnt) AS Basket_SiMee_Spend_Amnt,
+		SUM(Basket_Medical_Spend_Amnt) AS Basket_Medical_Spend_Amnt,
+		SUM(Basket_IONCare_Spend_Amnt) AS Basket_IONCare_Spend_Amnt,
 		SUM(Basket_Num_Kinka_Products) + SUM(Basket_Num_Revy_Products) + SUM(Basket_Num_SiMee_Products) + SUM(Basket_Num_Medical_Products) + SUM(Basket_Num_IONCare_Products) AS Basket_Total_Num_Products,
 		ROUND(((SUM(Basket_Num_Kinka_Products) + SUM(Basket_Num_Revy_Products) + SUM(Basket_Num_SiMee_Products) + SUM(Basket_Num_Medical_Products) + SUM(Basket_Num_IONCare_Products)) * 100.0 / SUM(Num_Of_Orders)) / 100, 2) AS Avg_Basket_Size
 	FROM total_customers_data
@@ -158,7 +163,12 @@ WITH customer_loyalty_aggregates AS (
 	ROUND(Basket_Num_Revy_Products * 100.0 / Basket_Total_Num_Products, 2) AS Basket_Pct_Revy_Products,
 	ROUND(Basket_Num_SiMee_Products * 100.0 / Basket_Total_Num_Products, 2) AS Basket_Pct_SiMee_Products,
 	ROUND(Basket_Num_Medical_Products * 100.0 / Basket_Total_Num_Products, 2) AS Basket_Pct_Medical_Products,
-	ROUND(Basket_Num_IONCare_Products * 100.0 / Basket_Total_Num_Products, 2) AS Basket_Pct_IONCare_Products
+	ROUND(Basket_Num_IONCare_Products * 100.0 / Basket_Total_Num_Products, 2) AS Basket_Pct_IONCare_Products,
+	Basket_Kinka_Spend_Amnt / Basket_Num_Kinka_Products AS Basket_Avg_Spend_On_Kinka,
+	Basket_Revy_Spend_Amnt / Basket_Num_Revy_Products AS Basket_Avg_Spend_On_Revy,
+	Basket_SiMee_Spend_Amnt / Basket_Num_SiMee_Products AS Basket_Avg_Spend_On_SiMee,
+	Basket_Medical_Spend_Amnt / Basket_Num_Medical_Products AS Basket_Avg_Spend_On_Medical,
+	Basket_IONCare_Spend_Amnt / Basket_Num_IONCare_Products AS Basket_Avg_Spend_On_IONCare
 FROM customer_loyalty_aggregates;
 
 
