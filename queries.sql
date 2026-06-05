@@ -58,7 +58,12 @@ CREATE TABLE total_orders_data AS
 		SUM(CASE WHEN Brand = 'Revy' THEN SKU_Subtotal_After_Discount END) AS Basket_Revy_Spend_Amnt,
 		SUM(CASE WHEN Brand = 'SiMee' THEN SKU_Subtotal_After_Discount END) AS Basket_SiMee_Spend_Amnt,
 		SUM(CASE WHEN Brand = 'Y tế' THEN SKU_Subtotal_After_Discount END) AS Basket_Medical_Spend_Amnt,
-		SUM(CASE WHEN Brand = 'IONCare' THEN SKU_Subtotal_After_Discount END) AS Basket_IONCare_Spend_Amnt
+		SUM(CASE WHEN Brand = 'IONCare' THEN SKU_Subtotal_After_Discount END) AS Basket_IONCare_Spend_Amnt,
+		SUM(CASE WHEN Brand = 'Kinka' THEN Pack_Size END) AS Basket_Total_Kinka_Packsize,
+		SUM(CASE WHEN Brand = 'Revy' THEN Pack_Size END) AS Basket_Total_Revy_Packsize,
+		SUM(CASE WHEN Brand = 'SiMee' THEN Pack_Size END) AS Basket_Total_SiMee_Packsize,
+		SUM(CASE WHEN Brand = 'IONCare' THEN Pack_Size END) AS Basket_Total_IONCare_Packsize,
+		SUM(CASE WHEN Brand = 'Y tế' THEN Pack_Size END) AS Basket_Total_Medical_Packsize
 	FROM excel_data
 	GROUP BY Order_ID
 	ORDER BY Order_Time DESC;
@@ -97,7 +102,12 @@ WITH customer_aggregates AS (
 		SUM(Basket_Revy_Spend_Amnt) AS Basket_Revy_Spend_Amnt,
 		SUM(Basket_SiMee_Spend_Amnt) AS Basket_SiMee_Spend_Amnt,
 		SUM(Basket_Medical_Spend_Amnt) AS Basket_Medical_Spend_Amnt,
-		SUM(Basket_IONCare_Spend_Amnt) AS Basket_IONCare_Spend_Amnt
+		SUM(Basket_IONCare_Spend_Amnt) AS Basket_IONCare_Spend_Amnt,
+		SUM(Basket_Total_Kinka_Packsize) AS Basket_Total_Kinka_Packsize,
+		SUM(Basket_Total_Revy_Packsize) AS Basket_Total_Revy_Packsize,
+		SUM(Basket_Total_SiMee_Packsize) AS Basket_Total_SiMee_Packsize,
+		SUM(Basket_Total_Medical_Packsize) AS Basket_Total_Medical_Packsize,
+		SUM(Basket_Total_IONCare_Packsize) AS Basket_Total_IONCare_Packsize
     FROM total_orders_data
     GROUP BY Buyer_Username
 )
@@ -150,9 +160,14 @@ WITH customer_loyalty_aggregates AS (
 		SUM(Basket_Revy_Spend_Amnt) AS Basket_Revy_Spend_Amnt,
 		SUM(Basket_SiMee_Spend_Amnt) AS Basket_SiMee_Spend_Amnt,
 		SUM(Basket_Medical_Spend_Amnt) AS Basket_Medical_Spend_Amnt,
-		SUM(Basket_IONCare_Spend_Amnt) AS Basket_IONCare_Spend_Amnt,
+		SUM(Basket_IONCare_Spend_Amnt) AS Basket_IONCare_Spend_Amnt,	
 		SUM(Basket_Num_Kinka_Products) + SUM(Basket_Num_Revy_Products) + SUM(Basket_Num_SiMee_Products) + SUM(Basket_Num_Medical_Products) + SUM(Basket_Num_IONCare_Products) AS Basket_Total_Num_Products,
-		ROUND(((SUM(Basket_Num_Kinka_Products) + SUM(Basket_Num_Revy_Products) + SUM(Basket_Num_SiMee_Products) + SUM(Basket_Num_Medical_Products) + SUM(Basket_Num_IONCare_Products)) * 100.0 / SUM(Num_Of_Orders)) / 100, 2) AS Avg_Basket_Size
+		ROUND(((SUM(Basket_Num_Kinka_Products) + SUM(Basket_Num_Revy_Products) + SUM(Basket_Num_SiMee_Products) + SUM(Basket_Num_Medical_Products) + SUM(Basket_Num_IONCare_Products)) * 100.0 / SUM(Num_Of_Orders)) / 100, 2) AS Avg_Basket_Size,
+		ROUND(SUM(Basket_Total_Kinka_Packsize) / SUM(Basket_Num_Kinka_Products), 2) AS Basket_Avg_Kinka_Packsize,
+		ROUND(SUM(Basket_Total_Revy_Packsize) / SUM(Basket_Num_Revy_Products), 2) AS Basket_Avg_Revy_Packsize,
+		ROUND(SUM(Basket_Total_SiMee_Packsize) / SUM(Basket_Num_SiMee_Products), 2) AS Basket_Avg_SiMee_Packsize,
+		ROUND(SUM(Basket_Total_Medical_Packsize) / SUM(Basket_Num_Medical_Products), 2) AS Basket_Avg_Medical_Packsize,
+		ROUND(SUM(Basket_Total_IONCare_Packsize) / SUM(Basket_Num_IONCare_Products), 2) AS Basket_Avg_IONCare_Packsize
 	FROM total_customers_data
 	GROUP BY Loyalty_Tier
 	ORDER BY Loyalty_Tier
