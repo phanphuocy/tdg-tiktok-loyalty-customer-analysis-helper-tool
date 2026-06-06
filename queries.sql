@@ -239,7 +239,7 @@ CREATE TABLE monthly_customers_data AS
         CASE 
             WHEN SUBSTR(Lifetime_First_Seen, 1, 7) < SUBSTR(First_Seen_In_Month, 1, 7) THEN 'Return From Previous Month'
             ELSE 'Newly Accquired'
-        END AS Accquistion_Type
+        END AS Acquisition_Type
     FROM customer_aggregates;
 
 
@@ -249,19 +249,19 @@ CREATE TABLE monthly_customers_data AS
 ----------------- MONTHLY CUSTOMERS LOYALTY --------------------
 ----------------------------------------------------------------
 
-
 DROP TABLE IF EXISTS monthly_customers_loyalty;
 
 CREATE TABLE monthly_customers_loyalty AS
     WITH customer_loyalty_aggregates AS (
         SELECT 
             Order_Month,
-            Accquistion_Type, 
+            Acquisition_Type, 
             COUNT(Buyer_Username) AS Num_Of_Customers,
             -- Partition by Order_Month ensures percentages reset every month --
             ROUND((COUNT(Buyer_Username) * 100.0) / SUM(COUNT(Buyer_Username)) OVER(PARTITION BY Order_Month), 2) AS Pct_Num_Of_Customers,
             SUM(Total_Customer_Spending) AS Total_Customer_Spending,
             ROUND((SUM(Total_Customer_Spending) * 100.0) / SUM(SUM(Total_Customer_Spending)) OVER(PARTITION BY Order_Month), 2) AS Pct_Total_Customer_Spending,
+            SUM(Num_of_Orders) AS Num_of_Orders,
             SUM(Total_Customer_Spending) / SUM(Num_of_Orders) AS Average_Purchase_Value,
             ROUND(AVG(Num_Of_Orders), 2) AS Avg_Num_Of_Orders,
             ROUND(AVG(Num_of_Canceled_Orders), 2) AS Avg_Num_of_Canceled_Orders,
@@ -284,8 +284,8 @@ CREATE TABLE monthly_customers_loyalty AS
             ROUND(SUM(Basket_Total_Medical_Packsize) / NULLIF(SUM(Basket_Num_Medical_Products), 0), 2) AS Basket_Avg_Medical_Packsize,
             ROUND(SUM(Basket_Total_IONCare_Packsize) / NULLIF(SUM(Basket_Num_IONCare_Products), 0), 2) AS Basket_Avg_IONCare_Packsize
         FROM monthly_customers_data
-        GROUP BY Order_Month, Accquistion_Type
-        ORDER BY Order_Month DESC, Accquistion_Type
+        GROUP BY Order_Month, Acquisition_Type
+        ORDER BY Order_Month DESC, Acquisition_Type
     ) SELECT 
         *,
         ROUND(Basket_Num_Kinka_Products * 100.0 / NULLIF(Basket_Total_Num_Products, 0), 2) AS Basket_Pct_Kinka_Products,
