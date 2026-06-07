@@ -243,7 +243,7 @@ WITH customer_loyalty_aggregates AS (
 		SUM(Total_Customer_Spending) / SUM(Num_of_Orders) AS Average_Purchase_Value,
 		ROUND(AVG(Num_Of_Orders), 2) AS Avg_Num_Of_Orders,
 		ROUND(AVG(Num_of_Canceled_Orders), 2) AS Avg_Num_of_Canceled_Orders,
-		ROUND((SUM(Num_of_Canceled_Orders) * 100.0) / SUM(Num_Of_Orders), 2) AS Canceled_Rate,
+		ROUND((SUM(Num_of_Canceled_Orders) * 100.0) / SUM(Num_Of_Orders), 2) AS Cancellation_Rate,
 		ROUND(AVG(Retention_Time_Period), 2) AS Avg_Retention_Time_Period,
 		SUM(Basket_Num_Kinka_Products) AS Basket_Num_Kinka_Products,
 		SUM(Basket_Num_Revy_Products) AS Basket_Num_Revy_Products,
@@ -325,6 +325,9 @@ CREATE TABLE monthly_customers_data AS
     )
     SELECT 
         *,
+        -- Determine Lifetime period
+        (JULIANDAY(Last_Seen_In_Month) - MIN(JULIANDAY(First_Seen_In_Month), JULIANDAY(Lifetime_First_Seen))) AS Retention_Time_Period,
+        -- Determine Acquisitional type
         ROUND(Basket_Num_Kinka_Products * 100.0 / NULLIF(Basket_Total_Num_Products, 0), 2) AS Basket_Pct_Kinka_Products,
         ROUND(Basket_Num_Revy_Products * 100.0 / NULLIF(Basket_Total_Num_Products, 0), 2) AS Basket_Pct_Revy_Products,
         ROUND(Basket_Num_SiMee_Products * 100.0 / NULLIF(Basket_Total_Num_Products, 0), 2) AS Basket_Pct_SiMee_Products,
@@ -353,13 +356,14 @@ CREATE TABLE monthly_customers_loyalty AS
             COUNT(Buyer_Username) AS Num_Of_Customers,
             -- Partition by Order_Month ensures percentages reset every month --
             ROUND((COUNT(Buyer_Username) * 100.0) / SUM(COUNT(Buyer_Username)) OVER(PARTITION BY Order_Month), 2) AS Pct_Num_Of_Customers,
+            AVG(Retention_Time_Period) AS Retention_Time_Period,
             SUM(Total_Customer_Spending) AS Total_Customer_Spending,
             ROUND((SUM(Total_Customer_Spending) * 100.0) / SUM(SUM(Total_Customer_Spending)) OVER(PARTITION BY Order_Month), 2) AS Pct_Total_Customer_Spending,
             SUM(Num_of_Orders) AS Num_of_Orders,
             SUM(Total_Customer_Spending) / SUM(Num_of_Orders) AS Average_Purchase_Value,
             ROUND(AVG(Num_Of_Orders), 2) AS Avg_Num_Of_Orders,
             ROUND(AVG(Num_of_Canceled_Orders), 2) AS Avg_Num_of_Canceled_Orders,
-            ROUND((SUM(Num_of_Canceled_Orders) * 100.0) / SUM(Num_Of_Orders), 2) AS Canceled_Rate,
+            ROUND((SUM(Num_of_Canceled_Orders) * 100.0) / SUM(Num_Of_Orders), 2) AS Cancellation_Rate,
             SUM(Basket_Num_Kinka_Products) AS Basket_Num_Kinka_Products,
             SUM(Basket_Num_Revy_Products) AS Basket_Num_Revy_Products,
             SUM(Basket_Num_SiMee_Products) AS Basket_Num_SiMee_Products,
@@ -417,3 +421,14 @@ WHERE EXISTS (
     WHERE c.Buyer_Username = o.Buyer_Username
       AND o.Order_Time BETWEEN '2026-04-01 00:00:00' AND '2026-04-30 23:59:59'
 );
+
+
+-- Calcute pivot tables for average price and packsize of each SKU
+SELECT 
+	Product_SKU_Name,
+	ROUND(AVG(SKU_Subtotal_After_Discount / Quantity), 2),
+	ROUND(AVG(Pack_Size), 2),
+	substr(Created_Time, 7, 4) || '-' || substr(Created_Time, 4, 2) AS Month_Year
+FROM excel_data
+WHERE Category != 'Quà tặng'
+GROUP BY Month_Year, Product_SKU_Name
