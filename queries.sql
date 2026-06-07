@@ -71,7 +71,6 @@ CREATE TABLE total_orders_data AS
 
 
 
-
 -----------------------------------------
 ---------- TOTAL CUSTOMERS TABLE --------
 -----------------------------------------
@@ -80,7 +79,6 @@ DROP TABLE IF EXISTS total_customers_data;
 
 CREATE TABLE total_customers_data AS
 WITH customer_aggregates AS (
-    -- Step 1: Do the math
     SELECT 
         Buyer_Username,
         COUNT(Order_ID) AS Num_of_Orders,
@@ -107,7 +105,11 @@ WITH customer_aggregates AS (
 		SUM(Basket_Total_Revy_Packsize) AS Basket_Total_Revy_Packsize,
 		SUM(Basket_Total_SiMee_Packsize) AS Basket_Total_SiMee_Packsize,
 		SUM(Basket_Total_Medical_Packsize) AS Basket_Total_Medical_Packsize,
-		SUM(Basket_Total_IONCare_Packsize) AS Basket_Total_IONCare_Packsize
+		SUM(Basket_Total_IONCare_Packsize) AS Basket_Total_IONCare_Packsize,
+        --- These attributes reserved to calculate the interests of customers into each brand products
+        MIN(CASE WHEN Basket_Num_Kinka_Products > 0 THEN Order_Time END) AS First_Time_Purchase_Kinka,
+        MIN(CASE WHEN Basket_Num_Revy_Products > 0 THEN Order_Time END) AS First_Time_Purchase_Revy,
+        MIN(CASE WHEN Basket_Num_SiMee_Products > 0 THEN Order_Time END) AS First_Time_Purchase_SiMee
     FROM total_orders_data
     GROUP BY Buyer_Username
 )
@@ -126,9 +128,101 @@ SELECT
         WHEN Num_of_Orders >= 2 THEN 'Regular / Loyal'
         WHEN Num_of_Orders = 1 THEN 'One-Time Buyer'
         ELSE 'Unsorted'
-    END AS Loyalty_Tier
+    END AS Loyalty_Tier,
+    CASE
+        WHEN First_Time_Purchase_Kinka IS NULL AND First_Time_Purchase_Revy IS NULL AND First_Time_Purchase_SiMee IS NULL THEN 'Not buy any of 3 brands'
+        WHEN First_Time_Purchase_Kinka > 0 AND First_Time_Purchase_Revy IS NULL AND First_Time_Purchase_SiMee IS NULL THEN 'Only with Kinka'
+        WHEN First_Time_Purchase_Kinka IS NULL AND First_Time_Purchase_Revy > 0 AND First_Time_Purchase_SiMee IS NULL THEN 'Only with Revy'
+        WHEN First_Time_Purchase_Kinka IS NULL AND First_Time_Purchase_Revy IS NULL AND First_Time_Purchase_SiMee > 0 THEN 'Only with SiMee'
+        WHEN 
+            First_Time_Purchase_Kinka IS NOT NULL AND First_Time_Purchase_Revy IS NOT NULL
+            AND MIN(First_Time_Purchase_Kinka, First_Time_Purchase_Revy, COALESCE(First_Time_Purchase_SiMee, '9999-12-31 23:59')) = First_Time_Purchase_Kinka
+            AND First_Time_Purchase_Kinka = First_Time_Purchase_Revy
+            THEN 'Start with Kinka and Revy'
+        WHEN 
+            First_Time_Purchase_Kinka IS NOT NULL AND First_Time_Purchase_SiMee IS NOT NULL
+            AND MIN(First_Time_Purchase_Kinka, First_Time_Purchase_SiMee, COALESCE(First_Time_Purchase_Kinka, '9999-12-31 23:59')) = First_Time_Purchase_Kinka
+            AND First_Time_Purchase_Kinka = First_Time_Purchase_SiMee
+            THEN 'Start with Kinka and SiMee'
+        WHEN 
+            First_Time_Purchase_Revy IS NOT NULL AND First_Time_Purchase_SiMee IS NOT NULL
+            AND MIN(First_Time_Purchase_Revy, First_Time_Purchase_SiMee, COALESCE(First_Time_Purchase_Revy, '9999-12-31 23:59')) = First_Time_Purchase_Revy
+            AND First_Time_Purchase_Revy = First_Time_Purchase_SiMee
+            THEN 'Start with Revy and SiMee'
+        WHEN 
+            First_Time_Purchase_Kinka IS NOT NULL AND First_Time_Purchase_Revy IS NOT NULL AND First_Time_Purchase_SiMee
+            AND First_Time_Purchase_Revy = First_Time_Purchase_SiMee
+            AND First_Time_Purchase_Revy = First_Time_Purchase_Kinka
+            THEN 'Start with all 3 brands'
+        WHEN 
+            First_Time_Purchase_Kinka IS NOT NULL
+            AND MIN(First_Time_Purchase_Kinka, COALESCE(First_Time_Purchase_Revy, '9999-12-31 23:59'), COALESCE(First_Time_Purchase_SiMee, '9999-12-31 23:59')) = First_Time_Purchase_Kinka
+            THEN 'Start with Kinka'
+        WHEN 
+            First_Time_Purchase_Revy IS NOT NULL
+            AND MIN(First_Time_Purchase_Revy, COALESCE(First_Time_Purchase_Kinka, '9999-12-31 23:59'), COALESCE(First_Time_Purchase_SiMee, '9999-12-31 23:59')) = First_Time_Purchase_Revy
+            THEN 'Start with Revy'
+        WHEN 
+            First_Time_Purchase_SiMee IS NOT NULL
+            AND MIN(First_Time_Purchase_SiMee, COALESCE(First_Time_Purchase_Revy, '9999-12-31 23:59'), COALESCE(First_Time_Purchase_Kinka, '9999-12-31 23:59')) = First_Time_Purchase_SiMee
+            THEN 'Start with SiMee'
+        ELSE 'Unsorted'
+    END AS 'Funnel_Group'
 FROM customer_aggregates;
 
+
+
+ALTER TABLE total_customers_data
+ADD Switching_Status VARCHAR(255);
+
+UPDATE total_customers_data
+SET Switching_Status = 'Non-Switcher'
+WHERE Funnel_Group = 'Only with Kinka'
+	OR Funnel_Group = 'Only with Revy'
+	OR Funnel_Group = 'Only with SiMee';
+	
+UPDATE total_customers_data
+SET Switching_Status = 'Switcher'
+WHERE (Funnel_Group = 'Start with Kinka and Revy' AND First_Time_Purchase_SiMee IS NOT NULL)
+	OR (Funnel_Group = 'Start with Kinka and SiMee' AND First_Time_Purchase_Revy IS NOT NULL)
+	OR (Funnel_Group = 'Start with Revy and SiMee' AND First_Time_Purchase_Kinka IS NOT NULL);
+	
+UPDATE total_customers_data
+SET Switching_Status = 'Non-Switcher'
+WHERE (Funnel_Group = 'Start with Kinka and Revy' AND First_Time_Purchase_SiMee IS NULL)
+	OR (Funnel_Group = 'Start with Kinka and SiMee' AND First_Time_Purchase_Revy IS NULL)
+	OR (Funnel_Group = 'Start with Revy and SiMee' AND First_Time_Purchase_Kinka IS NULL);
+	
+UPDATE total_customers_data
+SET Switching_Status = 'Switcher'
+WHERE (Funnel_Group = 'Start with Kinka' AND (First_Time_Purchase_Revy IS NOT NULL OR First_Time_Purchase_SiMee IS NOT NULL))
+	OR (Funnel_Group = 'Start with Revy' AND (First_Time_Purchase_Kinka IS NOT NULL OR First_Time_Purchase_SiMee IS NOT NULL))
+	OR (Funnel_Group = 'Start with SiMee' AND (First_Time_Purchase_Kinka IS NOT NULL OR First_Time_Purchase_Revy IS NOT NULL));
+	
+UPDATE total_customers_data
+SET Switching_Status = 'Start with all 3 brands'
+WHERE Funnel_Group = 'Start with all 3 brands';
+
+UPDATE total_customers_data
+SET Switching_Status = 'Not buy any of 3 brands'
+WHERE Funnel_Group = 'Not buy any of 3 brands';
+
+UPDATE total_customers_data
+SET Switching_Status = 'Unsorted'
+WHERE Funnel_Group = 'Unsorted';
+
+SELECT 
+	Loyalty_Tier,
+	Switching_Status, 
+	COUNT(Buyer_Username) AS Group_Size,
+	SUM(COUNT(Buyer_Username)) OVER() AS Total_Customers,
+	ROUND(
+        COUNT(Buyer_Username) * 100.0 / SUM(COUNT(Buyer_Username)) OVER(), 
+        2
+    ) AS Percentage_of_Total
+FROM total_customers_data
+WHERE Loyalty_Tier = 'Regular / Loyal'
+GROUP BY Loyalty_Tier, Switching_Status;
 
 
 -----------------------------------------------------------------------

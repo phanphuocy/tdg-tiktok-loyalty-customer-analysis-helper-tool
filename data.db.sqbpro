@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="/home/phanphuocy/Projects/tdg-tiktok-loyalty-customer-analysis-helper-tool/data.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser query pragmas" current="1"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="8794"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><current_table name="4,20:maintotal_customers_data"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="excel_data" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="156"/><column index="2" value="112"/><column index="3" value="149"/><column index="4" value="186"/><column index="5" value="158"/><column index="6" value="165"/><column index="7" value="242"/><column index="8" value="300"/><column index="9" value="300"/><column index="10" value="69"/><column index="11" value="176"/><column index="12" value="179"/><column index="13" value="229"/><column index="14" value="175"/><column index="15" value="154"/><column index="16" value="218"/><column index="17" value="216"/><column index="18" value="166"/><column index="19" value="221"/><column index="20" value="242"/><column index="21" value="207"/><column index="22" value="45"/><column index="23" value="110"/><column index="24" value="169"/><column index="25" value="145"/><column index="26" value="145"/><column index="27" value="145"/><column index="28" value="145"/><column index="29" value="145"/><column index="30" value="145"/><column index="31" value="79"/><column index="32" value="251"/><column index="33" value="136"/><column index="34" value="135"/><column index="35" value="137"/><column index="36" value="157"/><column index="37" value="186"/><column index="38" value="300"/><column index="39" value="193"/><column index="40" value="300"/><column index="41" value="119"/><column index="42" value="67"/><column index="43" value="159"/><column index="44" value="196"/><column index="45" value="176"/><column index="46" value="300"/><column index="47" value="300"/><column index="48" value="264"/><column index="49" value="86"/><column index="50" value="181"/><column index="51" value="165"/><column index="52" value="300"/><column index="53" value="120"/><column index="54" value="152"/><column index="55" value="128"/><column index="56" value="161"/><column index="57" value="272"/><column index="58" value="142"/><column index="59" value="68"/><column index="60" value="75"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="monthly_customers_data" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="2" value="184"/><column index="3" value="115"/><column index="4" value="189"/><column index="5" value="148"/><column index="6" value="155"/><column index="7" value="145"/><column index="8" value="152"/><column index="9" value="192"/><column index="10" value="145"/><column index="11" value="186"/><column index="12" value="214"/><column index="13" value="208"/><column index="14" value="217"/><column index="15" value="229"/><column index="16" value="233"/><column index="17" value="208"/><column index="18" value="125"/><column index="19" value="200"/><column index="20" value="194"/><column index="21" value="203"/><column index="22" value="215"/><column index="23" value="219"/><column index="24" value="213"/><column index="25" value="208"/><column index="26" value="216"/><column index="27" value="228"/><column index="28" value="232"/><column index="29" value="203"/><column index="30" value="198"/><column index="31" value="207"/><column index="32" value="219"/><column index="33" value="222"/><column index="34" value="191"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter><filter value="m***tan428"/></global_filter></table><table schema="main" name="monthly_customers_loyalty" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="2" value="191"/><column index="3" value="146"/><column index="4" value="176"/><column index="5" value="192"/><column index="6" value="222"/><column index="7" value="115"/><column index="8" value="186"/><column index="9" value="151"/><column index="10" value="222"/><column index="11" value="111"/><column index="12" value="214"/><column index="13" value="208"/><column index="14" value="217"/><column index="15" value="229"/><column index="16" value="233"/><column index="17" value="200"/><column index="18" value="194"/><column index="19" value="203"/><column index="20" value="215"/><column index="21" value="219"/><column index="22" value="208"/><column index="23" value="125"/><column index="24" value="205"/><column index="25" value="200"/><column index="26" value="208"/><column index="27" value="220"/><column index="28" value="224"/><column index="29" value="203"/><column index="30" value="198"/><column index="31" value="207"/><column index="32" value="219"/><column index="33" value="222"/><column index="34" value="215"/><column index="35" value="211"/><column index="36" value="218"/><column index="37" value="230"/><column index="38" value="234"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="total_customers_data" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort><column index="36" mode="0"/></sort><column_widths><column index="1" value="184"/><column index="2" value="115"/><column index="3" value="189"/><column index="4" value="125"/><column index="5" value="125"/><column index="6" value="172"/><column index="7" value="192"/><column index="8" value="145"/><column index="9" value="186"/><column index="10" value="214"/><column index="11" value="208"/><column index="12" value="217"/><column index="13" value="229"/><column index="14" value="233"/><column index="15" value="208"/><column index="16" value="125"/><column index="17" value="200"/><column index="18" value="194"/><column index="19" value="203"/><column index="20" value="215"/><column index="21" value="219"/><column index="22" value="213"/><column index="23" value="208"/><column index="24" value="216"/><column index="25" value="228"/><column index="26" value="232"/><column index="27" value="203"/><column index="28" value="198"/><column index="29" value="207"/><column index="30" value="219"/><column index="31" value="222"/><column index="32" value="178"/><column index="35" value="78"/><column index="36" value="217"/></column_widths><filter_values><column index="36" value="Start"/></filter_values><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="total_customers_loyalty" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="178"/><column index="2" value="146"/><column index="3" value="176"/><column index="4" value="192"/><column index="5" value="222"/><column index="6" value="186"/><column index="7" value="151"/><column index="8" value="222"/><column index="9" value="111"/><column index="10" value="206"/><column index="11" value="214"/><column index="12" value="208"/><column index="13" value="217"/><column index="14" value="229"/><column index="15" value="233"/><column index="16" value="200"/><column index="17" value="194"/><column index="18" value="203"/><column index="19" value="215"/><column index="20" value="219"/><column index="21" value="208"/><column index="22" value="125"/><column index="23" value="205"/><column index="24" value="200"/><column index="25" value="208"/><column index="26" value="220"/><column index="27" value="224"/><column index="28" value="203"/><column index="29" value="198"/><column index="30" value="207"/><column index="31" value="219"/><column index="32" value="222"/><column index="33" value="215"/><column index="34" value="211"/><column index="35" value="218"/><column index="36" value="230"/><column index="37" value="234"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="total_orders_data" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort><column index="7" mode="0"/></sort><column_widths><column index="1" value="196"/><column index="2" value="110"/><column index="3" value="112"/><column index="4" value="147"/><column index="5" value="193"/><column index="6" value="256"/><column index="7" value="133"/><column index="8" value="214"/><column index="9" value="208"/><column index="10" value="217"/><column index="11" value="229"/><column index="12" value="233"/><column index="13" value="200"/><column index="14" value="194"/><column index="15" value="203"/><column index="16" value="215"/><column index="17" value="219"/><column index="18" value="213"/><column index="19" value="208"/><column index="20" value="216"/><column index="21" value="232"/><column index="22" value="228"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1">
+-----------------------------------------
+---------- TOTAL CUSTOMERS TABLE --------
+-----------------------------------------
+
+DROP TABLE IF EXISTS total_customers_data;
+
+CREATE TABLE total_customers_data AS
+WITH customer_aggregates AS (
+    SELECT 
+        Buyer_Username,
+        COUNT(Order_ID) AS Num_of_Orders,
+		COUNT(CASE WHEN Order_Status = 'Đã hủy' THEN 1 END) AS Num_of_Canceled_Orders,
+        MIN(Order_Time) AS First_Seen,
+        MAX(Order_Time) AS Last_Seen,
+        (JULIANDAY(MAX(Order_Time)) - JULIANDAY(MIN(Order_Time))) AS Retention_Time_Period,
+        SUM(Order_Amount) AS Total_Customer_Spending,
+        SUM(Sum_SKU_Subtotal_After_Discount) AS Merchandise_Value,
+        SUM(Order_Amount) / COUNT(Order_ID) AS Average_Purchase_Value,
+		SUM(Basket_Num_Kinka_Products) AS Basket_Num_Kinka_Products,
+		SUM(Basket_Num_Revy_Products) AS Basket_Num_Revy_Products,
+		SUM(Basket_Num_SiMee_Products) AS Basket_Num_SiMee_Products,
+		SUM(Basket_Num_Medical_Products) AS Basket_Num_Medical_Products,
+		SUM(Basket_Num_IONCare_Products) AS Basket_Num_IONCare_Products,
+		SUM(Basket_Num_Kinka_Products) + SUM(Basket_Num_Revy_Products) + SUM(Basket_Num_SiMee_Products) + SUM(Basket_Num_Medical_Products) + SUM(Basket_Num_IONCare_Products) AS Basket_Total_Num_Products,
+		ROUND(((SUM(Basket_Num_Kinka_Products) + SUM(Basket_Num_Revy_Products) + SUM(Basket_Num_SiMee_Products) + SUM(Basket_Num_Medical_Products) + SUM(Basket_Num_IONCare_Products)) * 100.0 / COUNT(Order_ID)) / 100, 2) AS Avg_Basket_Size,
+		SUM(Basket_Kinka_Spend_Amnt) AS Basket_Kinka_Spend_Amnt,
+		SUM(Basket_Revy_Spend_Amnt) AS Basket_Revy_Spend_Amnt,
+		SUM(Basket_SiMee_Spend_Amnt) AS Basket_SiMee_Spend_Amnt,
+		SUM(Basket_Medical_Spend_Amnt) AS Basket_Medical_Spend_Amnt,
+		SUM(Basket_IONCare_Spend_Amnt) AS Basket_IONCare_Spend_Amnt,
+		SUM(Basket_Total_Kinka_Packsize) AS Basket_Total_Kinka_Packsize,
+		SUM(Basket_Total_Revy_Packsize) AS Basket_Total_Revy_Packsize,
+		SUM(Basket_Total_SiMee_Packsize) AS Basket_Total_SiMee_Packsize,
+		SUM(Basket_Total_Medical_Packsize) AS Basket_Total_Medical_Packsize,
+		SUM(Basket_Total_IONCare_Packsize) AS Basket_Total_IONCare_Packsize,
+        --- These attributes reserved to calculate the interests of customers into each brand products
+        MIN(CASE WHEN Basket_Num_Kinka_Products &gt; 0 THEN Order_Time END) AS First_Time_Purchase_Kinka,
+        MIN(CASE WHEN Basket_Num_Revy_Products &gt; 0 THEN Order_Time END) AS First_Time_Purchase_Revy,
+        MIN(CASE WHEN Basket_Num_SiMee_Products &gt; 0 THEN Order_Time END) AS First_Time_Purchase_SiMee
+    FROM total_orders_data
+    GROUP BY Buyer_Username
+)
+SELECT 
+    *,
+	-- Calculates proportions of brand's product in basket --
+	ROUND(Basket_Num_Kinka_Products * 100.0 / Basket_Total_Num_Products, 2) AS Basket_Pct_Kinka_Products,
+	ROUND(Basket_Num_Revy_Products * 100.0 / Basket_Total_Num_Products, 2) AS Basket_Pct_Revy_Products,
+	ROUND(Basket_Num_SiMee_Products * 100.0 / Basket_Total_Num_Products, 2) AS Basket_Pct_SiMee_Products,
+	ROUND(Basket_Num_Medical_Products * 100.0 / Basket_Total_Num_Products, 2) AS Basket_Pct_Medical_Products,
+	ROUND(Basket_Num_IONCare_Products * 100.0 / Basket_Total_Num_Products, 2) AS Basket_Pct_IONCare_Products,
+    CASE 
+        WHEN Num_of_Orders &gt;= 1 AND Total_Customer_Spending = 0 THEN 'Affiliator'
+		WHEN (Num_Of_Orders - Num_of_Canceled_Orders = 0) THEN 'Canceled/No Purchases'
+		WHEN Retention_Time_Period &lt; 0.0208 AND Num_Of_Orders &gt;= 2 AND (Num_Of_Orders - Num_of_Canceled_Orders &gt;= 1) AND Num_of_Canceled_Orders != 0 THEN 'Confused One-Time Buyer'
+        WHEN Num_of_Orders &gt;= 2 THEN 'Regular / Loyal'
+        WHEN Num_of_Orders = 1 THEN 'One-Time Buyer'
+        ELSE 'Unsorted'
+    END AS Loyalty_Tier,
+    CASE
+        WHEN First_Time_Purchase_Kinka &gt; 0 AND First_Time_Purchase_Revy IS NULL AND First_Time_Purchase_SiMee IS NULL THEN 'Only with Kinka'
+        WHEN First_Time_Purchase_Kinka IS NULL AND First_Time_Purchase_Revy &gt; 0 AND First_Time_Purchase_SiMee IS NULL THEN 'Only with Revy'
+        WHEN First_Time_Purchase_Kinka IS NULL AND First_Time_Purchase_Revy IS NULL AND First_Time_Purchase_SiMee &gt; 0 THEN 'Only with SiMee'
+        WHEN 
+            First_Time_Purchase_Kinka &gt; 0
+            AND MIN(First_Time_Purchase_Kinka, First_Time_Purchase_Revy, First_Time_Purchase_SiMee) = First_Time_Purchase_Kinka
+            THEN 'Start with Kinka'
+        WHEN 
+            First_Time_Purchase_Revy &gt; 0
+            AND MIN(First_Time_Purchase_Kinka, First_Time_Purchase_Revy, First_Time_Purchase_SiMee) = First_Time_Purchase_Revy
+            THEN 'Start with Revy'
+        WHEN 
+            First_Time_Purchase_SiMee &gt; 0
+            AND MIN(First_Time_Purchase_Kinka, First_Time_Purchase_Revy, First_Time_Purchase_SiMee) = First_Time_Purchase_SiMee
+            THEN 'Start with SiMee'
+        ELSE 'Unsorted'
+    END AS 'Funnel Group'
+FROM customer_aggregates;
+</sql><current_tab id="0"/></tab_sql></sqlb_project>
