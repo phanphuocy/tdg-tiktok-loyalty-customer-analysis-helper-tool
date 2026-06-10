@@ -2,7 +2,7 @@ CLEAR_OUT_GIFT_DATA = """
     --sql
     UPDATE excel_data
     SET Category = 'Quà tặng'
-    WHERE SKU_Subtotal_Before_Discount = 0;
+    WHERE SKU_Subtotal_Before_Discount = 0 AND Normal_Or_Pre_order IS NOT NULL;
 """
 
 PRE_CREATE_TOTAL_ORDERS_TABLE = """
@@ -115,12 +115,12 @@ CREATE_TOTAL_CUSTOMERS_TABLE = """
                 THEN 'Start with Kinka and Revy'
             WHEN 
                 First_Time_Purchase_Kinka IS NOT NULL AND First_Time_Purchase_SiMee IS NOT NULL
-                AND MIN(First_Time_Purchase_Kinka, First_Time_Purchase_SiMee, COALESCE(First_Time_Purchase_Kinka, '9999-12-31 23:59')) = First_Time_Purchase_Kinka
+                AND MIN(First_Time_Purchase_Kinka, First_Time_Purchase_SiMee, COALESCE(First_Time_Purchase_Revy, '9999-12-31 23:59')) = First_Time_Purchase_Kinka
                 AND First_Time_Purchase_Kinka = First_Time_Purchase_SiMee
                 THEN 'Start with Kinka and SiMee'
             WHEN 
                 First_Time_Purchase_Revy IS NOT NULL AND First_Time_Purchase_SiMee IS NOT NULL
-                AND MIN(First_Time_Purchase_Revy, First_Time_Purchase_SiMee, COALESCE(First_Time_Purchase_Revy, '9999-12-31 23:59')) = First_Time_Purchase_Revy
+                AND MIN(First_Time_Purchase_Revy, First_Time_Purchase_SiMee, COALESCE(First_Time_Purchase_Kinka, '9999-12-31 23:59')) = First_Time_Purchase_Revy
                 AND First_Time_Purchase_Revy = First_Time_Purchase_SiMee
                 THEN 'Start with Revy and SiMee'
             WHEN 
@@ -169,7 +169,7 @@ UPDATE_TOTAL_CUSTOMERS_TABLE_WITH_FUNNEL_COL = """
         OR (Funnel_Group = 'Start with Kinka and Revy' AND First_Time_Purchase_SiMee IS NULL)
         OR (Funnel_Group = 'Start with Kinka and SiMee' AND First_Time_Purchase_Revy IS NULL)
         OR (Funnel_Group = 'Start with Revy and SiMee' AND First_Time_Purchase_Kinka IS NULL)
-            THEN 'Non-Switcher'
+            THEN 'Non-switcher'
 
         -- 3. 1-to-1 Funnel Group Matches
         WHEN Funnel_Group = 'Start with all 3 brands' THEN 'Start with all 3 brands'
@@ -180,6 +180,60 @@ UPDATE_TOTAL_CUSTOMERS_TABLE_WITH_FUNNEL_COL = """
         ELSE Switching_Status 
     END;
     """
+
+PRE_UPDATE_TOTAL_CUSTOMERS_TABLE_WITH_SWITCHINGTIME_COL = """
+    --sql
+    ALTER TABLE total_customers_data
+    ADD COLUMN Switching_Time VARCHAR(255);
+"""
+
+UPDATE_TOTAL_CUSTOMERS_TABLE_WITH_SWITCHINGTIME_COL = """
+    --sql
+    UPDATE total_customers_data
+    SET Switching_Time = CASE
+        WHEN Funnel_Group = 'Start with Kinka' THEN MIN(COALESCE(First_Time_Purchase_Revy, '9999-12-31'), COALESCE(First_Time_Purchase_SiMee, '9999-12-31'))
+        WHEN Funnel_Group = 'Start with Revy' THEN MIN(COALESCE(First_Time_Purchase_SiMee, '9999-12-31'), COALESCE(First_Time_Purchase_Kinka, '9999-12-31'))
+        WHEN Funnel_Group = 'Start with SiMee' THEN MIN(COALESCE(First_Time_Purchase_Revy, '9999-12-31'), COALESCE(First_Time_Purchase_Kinka, '9999-12-31'))
+        WHEN Funnel_Group = 'Start with Kinka and Revy' THEN First_Time_Purchase_SiMee
+        WHEN Funnel_Group = 'Start with Kinka and SiMee' THEN First_Time_Purchase_Revy
+        WHEN Funnel_Group = 'Start with Revy and SiMee' THEN First_Time_Purchase_Kinka
+        ELSE 'No Switching Time'
+    END
+    WHERE Switching_Status = 'Switcher';
+"""
+
+PRE_UPDATE_TOTAL_CUSTOMERS_TABLE_WITH_DAYTOSWITCH_COL = """
+    --sql
+    ALTER TABLE total_customers_data
+    ADD COLUMN Days_To_Switch REAL;
+"""
+
+UPDATE_TOTAL_CUSTOMERS_TABLE_WITH_DAYTOSWITCH_COL = """
+    --sql
+    UPDATE total_customers_data
+    SET Days_To_Switch = ROUND(JULIANDAY(Switching_Time) - JULIANDAY(First_Seen), 2)
+    WHERE Switching_Status = 'Switcher';
+"""
+
+CREATE_LOYAL_SWITCHING_CUSTOMERS_FILTER_TABLE = """
+    --sql
+    CREATE TABLE filter_loyal_switching_customers AS
+    SELECT Buyer_Username, Loyalty_Tier, Funnel_Group, First_Seen, Switching_Time, Days_To_Switch, Total_Customer_Spending, Num_of_Orders, Num_of_Canceled_Orders
+    FROM total_customers_data
+    WHERE Switching_Status = 'Switcher' AND Loyalty_Tier = 'Regular / Loyal'
+    ORDER BY Total_Customer_Spending DESC;
+"""
+
+CREATE_DAYSTOSWITCH_FUNNELGROUP_PIVOT_TABLE = """
+    -- How many days until customer to switch, by each funnel group?
+    CREATE TABLE pivot_daystoswitch_funnelgroup AS 
+    SELECT Funnel_Group, COUNT(Buyer_Username) AS Num_Of_Customers, ROUND(AVG(Days_To_Switch), 2) AS Days_To_Switch, ROUND(AVG(Total_Customer_Spending), 0) AS Avg_Customer_Value
+    FROM total_customers_data
+    WHERE Switching_Status = 'Switcher' AND Loyalty_Tier = 'Regular / Loyal'
+    GROUP BY Funnel_Group
+    ORDER BY COUNT(Buyer_Username) DESC;
+"""
+
 
 PRE_CREATE_TOTAL_CUSTOMERS_LOYALTY_TABLE = """
     --sql

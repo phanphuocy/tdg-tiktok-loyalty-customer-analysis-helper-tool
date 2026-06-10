@@ -461,4 +461,9 @@ SELECT
 FROM excel_data
 WHERE Category != 'Quà tặng' AND Normal_or_Pre_order = 'Normal'
 GROUP BY Month_Year, Product_SKU_Name, Category, Sub_category, Product_Variant
-ORDER BY Category ASC
+ORDER BY Category ASC;
+
+
+
+-- 
+
