@@ -224,25 +224,29 @@ CREATE_LOYAL_SWITCHING_CUSTOMERS_FILTER_TABLE = """
     ORDER BY Total_Customer_Spending DESC;
 """
 
-CREATE_DAYSTOSWITCH_FUNNELGROUP_PIVOT_TABLE = """
+CREATE_FUNNELGROUP_PIVOT_TABLE = """
     -- How many days until customer to switch, by each funnel group?
-    CREATE TABLE pivot_daystoswitch_funnelgroup AS 
-    SELECT Funnel_Group, COUNT(Buyer_Username) AS Num_Of_Customers, ROUND(AVG(Days_To_Switch), 2) AS Days_To_Switch, ROUND(AVG(Total_Customer_Spending), 0) AS Avg_Customer_Value
+    CREATE TABLE pivot_funnelgroup AS 
+       SELECT Funnel_Group, Switching_Status, Loyalty_Tier, 
+		COUNT(Buyer_Username) AS Num_Of_Customers, ROUND(AVG(Days_To_Switch), 2) AS Avg_Days_To_Switch, 
+        ROUND(AVG(Total_Customer_Spending), 0) AS Avg_Customer_Value,
+		ROUND(AVG(Average_Purchase_Value), 0) AS Avg_Purchase_Value,
+		ROUND(AVG(Num_of_Orders), 1) AS Avg_Num_Of_Orders
     FROM total_customers_data
-    WHERE Switching_Status = 'Switcher' AND Loyalty_Tier = 'Regular / Loyal'
+    WHERE Loyalty_Tier = 'Regular / Loyal'
     GROUP BY Funnel_Group
     ORDER BY COUNT(Buyer_Username) DESC;
 """
 
 
-PRE_CREATE_TOTAL_CUSTOMERS_LOYALTY_TABLE = """
+PRE_CREATE_PIVOT_LOYALTY_TABLE = """
     --sql
     DROP TABLE IF EXISTS total_customers_loyalty;
 """
 
-CREATE_TOTAL_CUSTOMERS_LOYALTY_TABLE = """
+CREATE_PIVOT_LOYALTY_TABLE = """
     --sql
-    CREATE TABLE total_customers_loyalty AS
+    CREATE TABLE pivot_loyalty_tier AS
     WITH customer_loyalty_aggregates AS (
         SELECT 
             Loyalty_Tier, 
@@ -350,14 +354,14 @@ CREATE_MONTHLY_CUSTOMERS_TABLE = """
     FROM customer_aggregates;
 """
 
-PRE_CREATE_MONTHLY_CUSTOMERS_LOYALTY_TABLE = """
+PRE_CREATE_PIVOT_MONTHLY_CUSTOMERS_ACQUISITION = """
     --sql
-    DROP TABLE IF EXISTS monthly_customers_loyalty;
+    DROP TABLE IF EXISTS pivot_monthly_customers_acquisition;
 """
 
-CREATE_MONTHLY_CUSTOMERS_LOYALTY_TABLE = """
+CREATE_PIVOT_MONTHLY_CUSTOMERS_ACQUISITION = """
     --sql
-    CREATE TABLE monthly_customers_loyalty AS
+    CREATE TABLE pivot_monthly_customers_acquisition AS
     WITH customer_loyalty_aggregates AS (
         SELECT 
             Order_Month,

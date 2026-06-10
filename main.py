@@ -85,7 +85,7 @@ cursor.execute(UPDATE_TOTAL_CUSTOMERS_TABLE_WITH_SWITCHINGTIME_COL)
 cursor.execute(PRE_UPDATE_TOTAL_CUSTOMERS_TABLE_WITH_DAYTOSWITCH_COL)
 cursor.execute(UPDATE_TOTAL_CUSTOMERS_TABLE_WITH_DAYTOSWITCH_COL)
 cursor.execute(CREATE_LOYAL_SWITCHING_CUSTOMERS_FILTER_TABLE)
-cursor.execute(CREATE_DAYSTOSWITCH_FUNNELGROUP_PIVOT_TABLE)
+cursor.execute(CREATE_FUNNELGROUP_PIVOT_TABLE)
 
 cursor.execute("SELECT * FROM total_customers_data")
 total_customers_data = cursor.fetchall()
@@ -95,12 +95,12 @@ print(f"Successfully added {len(total_customers_data)} rows into 'total_customer
 ### ----------------------------------------------------- ###
 ### ----------- TOTAL CUSTOMERS LOYALTY TABLE ----------- ###
 ### ----------------------------------------------------- ###
-cursor.execute(PRE_CREATE_TOTAL_CUSTOMERS_LOYALTY_TABLE)
-cursor.execute(CREATE_TOTAL_CUSTOMERS_LOYALTY_TABLE)
+cursor.execute(PRE_CREATE_PIVOT_LOYALTY_TABLE)
+cursor.execute(CREATE_PIVOT_LOYALTY_TABLE)
 
-cursor.execute("SELECT * FROM total_customers_loyalty")
-total_customers_loyalty = cursor.fetchall()
-print(f"Successfully added {len(total_customers_loyalty)} rows into 'total_customers_loyalty' table!")
+cursor.execute("SELECT * FROM pivot_loyalty_tier")
+pivot_loyalty_tier = cursor.fetchall()
+print(f"Successfully added {len(pivot_loyalty_tier)} rows into 'pivot_loyalty_tier' table!")
 
 
 ### ----------------------------------------------- ###
@@ -118,12 +118,12 @@ print(f"Successfully added {len(monthly_customers_data)} rows into 'monthly_cust
 ### ----------- MONTHLY CUSTOMERS LOYALTY TABLE ----------- ###
 ### ------------------------------------------------------- ###
 
-cursor.execute(PRE_CREATE_MONTHLY_CUSTOMERS_LOYALTY_TABLE)
-cursor.execute(CREATE_MONTHLY_CUSTOMERS_LOYALTY_TABLE)
+cursor.execute(PRE_CREATE_PIVOT_MONTHLY_CUSTOMERS_ACQUISITION)
+cursor.execute(CREATE_PIVOT_MONTHLY_CUSTOMERS_ACQUISITION)
 
-cursor.execute("SELECT * FROM monthly_customers_loyalty")
-monthly_customers_loyalty = cursor.fetchall()
-print(f"Successfully added {len(monthly_customers_loyalty)} rows into 'monthly_customers_loyalty' table!")
+cursor.execute("SELECT * FROM pivot_monthly_customers_acquisition")
+pivot_monthly_customers_acquisition = cursor.fetchall()
+print(f"Successfully added {len(pivot_monthly_customers_acquisition)} rows into 'pivot_monthly_customers_acquisition' table!")
 
 
 # 7. Commit changes and close the connection
