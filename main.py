@@ -125,6 +125,15 @@ cursor.execute("SELECT * FROM pivot_monthly_customers_acquisition")
 pivot_monthly_customers_acquisition = cursor.fetchall()
 print(f"Successfully added {len(pivot_monthly_customers_acquisition)} rows into 'pivot_monthly_customers_acquisition' table!")
 
+### ------------------------------------------- ###
+### ----------- OTHERS PIVOT TABLES ----------- ###
+### ------------------------------------------- ###
+
+cursor.execute(CREATE_PIVOT_MONTHLY_PRODUCTS)
+
+cursor.execute("SELECT * FROM pivot_monthly_products")
+pivot_monthly_products = cursor.fetchall()
+print(f"Successfully added {len(pivot_monthly_products)} rows into 'pivot_monthly_products' table!")
 
 # 7. Commit changes and close the connection
 conn.commit()

@@ -411,3 +411,45 @@ CREATE_PIVOT_MONTHLY_CUSTOMERS_ACQUISITION = """
         Basket_IONCare_Spend_Amnt / NULLIF(Basket_Num_IONCare_Products, 0) AS Basket_Avg_Spend_On_IONCare
     FROM customer_loyalty_aggregates;
 """
+
+CREATE_PIVOT_MONTHLY_PRODUCTS = """
+    --sql
+    -- Calculate pivot tables for average price and packsize of each SKU
+    
+    CREATE TABLE pivot_monthly_products AS
+    SELECT t1.*, 
+        COALESCE(t2.Nonaffiliated_Num_Of_Unit_Sold, 0) AS Nonaffiliated_Num_Of_Unit_Sold,
+        t1.Affiliated_Num_Of_Unit_Sold - COALESCE(t2.Nonaffiliated_Num_Of_Unit_Sold, 0) AS Num_Of_Affiliate_Sample_Unit,
+        COALESCE(t2.Nonaffiliated_Volume_Sold, 0) AS Nonaffiliated_Volume_Sold,
+        COALESCE(t2.Nonaffiliated_Avg_Price, 0) AS Nonaffiliated_Avg_Price
+    FROM (
+        SELECT 
+            substr(Created_Time, 7, 4) || '-' || substr(Created_Time, 4, 2) AS Month_Year,
+            Category,
+            Sub_category,
+            Product_SKU_Name,
+            Product_Variant,
+            SUM(SKU_Subtotal_After_Discount) AS Total_Merchanise_Value,
+            SUM(Quantity) AS Affiliated_Num_Of_Unit_Sold,
+            ROUND(SUM(Pack_Size),2) AS Affiliated_Volume_Sold
+        FROM excel_data
+        WHERE Category != 'Quà tặng'
+        GROUP BY Month_Year, Product_SKU_Name, Category, Product_Variant
+        ORDER BY Category ASC
+    ) t1 LEFT JOIN (
+        SELECT 
+            substr(Created_Time, 7, 4) || '-' || substr(Created_Time, 4, 2) AS Month_Year,
+            Product_SKU_Name,
+            Product_Variant,
+            COALESCE(SUM(Quantity), 0) AS Nonaffiliated_Num_Of_Unit_Sold,
+            ROUND(COALESCE(SUM(Pack_Size), 0), 2) AS Nonaffiliated_Volume_Sold,
+            ROUND(AVG(SKU_Subtotal_After_Discount / Quantity), 0) AS Nonaffiliated_Avg_Price
+        FROM excel_data
+        WHERE Category != 'Quà tặng' AND Normal_Or_Pre_order IS NOT NULL
+        GROUP BY Month_Year, Product_SKU_Name, Category, Product_Variant
+        ORDER BY Category ASC
+    ) t2 ON
+        t1.Month_Year = t2.Month_Year
+        AND t1.Product_SKU_Name = t2.Product_SKU_Name
+        AND t1.Product_Variant = t2.Product_Variant;
+"""

@@ -430,40 +430,61 @@ WHERE EXISTS (
       AND o.Order_Time BETWEEN '2026-04-01 00:00:00' AND '2026-04-30 23:59:59'
 );
 
-
--- Calculate pivot tables for average price and packsize of each SKU
-
+-- A draft of funnel aggregration table
 SELECT 
-	Category,
-	Product_SKU_Name,
-	SUM(Quantity) AS Num_Of_Unit_Sold,
-	ROUND(AVG(SKU_Subtotal_After_Discount / Quantity), 2) AS Avg_Price,
-	ROUND(AVG(Pack_Size), 2) AS Avg_Packsize,
-	substr(Created_Time, 7, 4) || '-' || substr(Created_Time, 4, 2) AS Month_Year
-FROM excel_data
-WHERE Category != 'Quà tặng'
-GROUP BY Month_Year, Product_SKU_Name, Category
-ORDER BY Category ASC
+    t1.Month,
+    t1.Total_Count,
+	COALESCE(t2.Returning_Count, 0) AS Returning_Count,
+    COALESCE(t3.Switching_Count, 0) AS Switching_Count
+FROM (
+    -- t1: Total customers per month
+    SELECT 
+        Order_Month AS Month,
+        COUNT(Buyer_Username) AS Total_Count
+    FROM monthly_customers_data
+    GROUP BY Order_Month
+) t1
+LEFT JOIN (
+	-- t2: Total returning customers per month
+    SELECT 
+        Order_Month AS Month,
+        COUNT(Buyer_Username) AS Returning_Count
+    FROM monthly_customers_data
+	WHERE Acquisition_Type = 'Return From Previous Month'
+    GROUP BY Order_Month
+) t2 ON t1.Month = t2.Month
+LEFT JOIN (
+    -- t3: Only 'Switcher' customers per month
+    SELECT 
+        SUBSTR(Switching_Time, 1, 7) AS Month, 
+        COUNT(Buyer_Username) AS Switching_Count
+    FROM total_customers_data
+    WHERE Switching_Status = 'Switcher'
+    GROUP BY SUBSTR(Switching_Time, 1, 7)
+) t3 ON t1.Month = t3.Month;
 
--- Calculate pivot tables for average price and packsize of each SKU
 
+-- find second purchase date
+WITH RankedPurchases AS (
+    SELECT 
+        Buyer_Username,
+        Order_Time,
+        ROW_NUMBER() OVER (
+            PARTITION BY Buyer_Username 
+            ORDER BY Order_Time ASC
+        ) AS purchase_rank
+    FROM total_orders_data
+)
 SELECT 
-	substr(Created_Time, 7, 4) || '-' || substr(Created_Time, 4, 2) AS Month_Year,
-	Category,
-	Sub_category,
-	Product_SKU_Name,
-	Product_Variant,
-	SUM(Quantity) AS Num_Of_Unit_Sold,
-	SUM(SKU_Subtotal_After_Discount) AS Total_Merchandise_Value,
-	SUM(Pack_Size) AS Volume_Sold,
-	ROUND(AVG(SKU_Subtotal_After_Discount / Quantity), 2) AS Avg_Price,
-	ROUND(AVG(Pack_Size), 2) AS Avg_Packsize
-FROM excel_data
-WHERE Category != 'Quà tặng' AND Normal_or_Pre_order = 'Normal'
-GROUP BY Month_Year, Product_SKU_Name, Category, Sub_category, Product_Variant
-ORDER BY Category ASC;
+    Buyer_Username,
+    Order_Time AS second_purchase_date
+FROM RankedPurchases
+WHERE purchase_rank = 2;
 
-
-
--- 
-
+-- Pivot table Loyalty_tier customers of each month
+SELECT 
+	SUBSTR(First_Seen, 1, 7) AS Entry_Month,
+	Loyalty_Tier,
+	COUNT(Buyer_Username)
+FROM total_customers_data
+GROUP BY Entry_Month, Loyalty_Tier
