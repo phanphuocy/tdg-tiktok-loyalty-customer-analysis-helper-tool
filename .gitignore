@@ -3,3 +3,12 @@
 .venv/
 
 Tất cả đơn hàng-2026-06-01-07_52.xlsx
+Product_Additional_Labels - Product_AddtionalLabels_Labels.csv
+data.db
+data.db.sqbpro
+data.sqbpro
+database.xlsx
+
+*.csv
+*.xlsx
+
