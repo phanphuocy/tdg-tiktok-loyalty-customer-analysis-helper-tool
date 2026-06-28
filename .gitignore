@@ -11,4 +11,8 @@ database.xlsx
 
 *.csv
 *.xlsx
+*.db
+*.db-journal
 
+charts/*
+clean Phân tích khách hàng mới, lặp lại và giá trị khách hàng trên kênh TikTok TDG 1.md

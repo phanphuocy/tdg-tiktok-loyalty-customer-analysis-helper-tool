@@ -1,16 +1,21 @@
 from openpyxl import load_workbook
 import sqlite3
 from pathlib import Path
+import pandas as pd
 
 from labelling import label_tuples_from_csv, add_label_header_tuple
 
 from queries import *
 
-orders_filename = 'Tất cả đơn hàng-2026-06-01-07_52.xlsx'
+# orders_filename = 'Tất cả đơn hàng-2026-06-01-07_52.xlsx'
+orders_filename = 'Tất cả đơn hàng-2026-06-18-16_39.xlsx'
+output_filename = 'data2.db'
 orders_active_sheet = 'OrderSKUList'
 
-product_labels_filename = 'Product_Additional_Labels - Product_AddtionalLabels_Labels.csv'
-product_labels_sheet = 'Product_AddtionalLabels_Labels'
+# product_labels_filename = 'Product_Additional_Labels - Product_AddtionalLabels_Labels.csv'
+product_labels_filename = 'Product_Additional_Labels2 - Product_AddtionalLabels_Labels2.csv'
+# product_labels_sheet = 'Product_AddtionalLabels_Labels'
+product_labels_sheet = 'Product_AddtionalLabels_Labels2'
 
 orders_workbook = load_workbook(filename=orders_filename)
 orders_sheet = orders_workbook[orders_active_sheet]
@@ -32,6 +37,8 @@ labelled_tuples, missing_ids = label_tuples_from_csv(
 
 labelled_headers = add_label_header_tuple(orders_headers)
 
+print(f"Missing ids: {len(missing_ids)}")
+
 # 3. Clean headers for SQL safety (replace spaces/special chars with underscores)
 clean_headers = [
     str(h).strip().replace(" ", "_").replace("-", "_") if h else f"column_{i}"
@@ -39,12 +46,12 @@ clean_headers = [
 ]
 
 # 4. Connect to SQLite database (creates 'data.db' file if it doesn't exist)
-file_path = Path('data.db')
+file_path = Path(output_filename)
 
 if file_path.is_file():
     file_path.unlink()
 
-conn = sqlite3.connect("data.db")
+conn = sqlite3.connect(output_filename)
 cursor = conn.cursor()
 
 # 5. Dynamically create the SQL table based on Excel headers
@@ -58,7 +65,7 @@ placeholders = ", ".join(["?"] * len(clean_headers))
 insert_query = f"INSERT INTO excel_data VALUES ({placeholders})"
 
 cursor.executemany(insert_query, labelled_tuples)
-print(f"Successfully converted {len(labelled_tuples)} rows into 'data.db'!")
+print(f"Successfully converted {len(labelled_tuples)} rows into '{output_filename}'!")
 
 cursor.execute(CLEAR_OUT_GIFT_DATA)
 
@@ -134,6 +141,44 @@ cursor.execute(CREATE_PIVOT_MONTHLY_PRODUCTS)
 cursor.execute("SELECT * FROM pivot_monthly_products")
 pivot_monthly_products = cursor.fetchall()
 print(f"Successfully added {len(pivot_monthly_products)} rows into 'pivot_monthly_products' table!")
+
+
+### --------------------------------------------- ###
+### ------------ RETENTION RATE TABLE ----------- ###
+### --------------------------------------------- ###
+
+cursor.execute("SELECT * FROM pivot_monthly_customers_acquisition")
+pivot_monthly_customers_acquisition = cursor.fetchall()
+
+columns = [desc[0] for desc in cursor.description]
+df = pd.DataFrame(pivot_monthly_customers_acquisition, columns=columns)
+df = df.sort_values('Order_Month').reset_index(drop=True)
+ 
+new = df[df['Acquisition_Type']=='Newly Accquired'][['Order_Month','Num_Of_Customers']].set_index('Order_Month')
+ret = df[df['Acquisition_Type']=='Return From Previous Month'][['Order_Month','Num_Of_Customers']].set_index('Order_Month')
+ 
+months = sorted(df['Order_Month'].unique())
+records = []
+total_new = 0
+ 
+for m in months:
+    n = new.loc[m, 'Num_Of_Customers'] if m in new.index else 0
+    r = ret.loc[m, 'Num_Of_Customers'] if m in ret.index else 0
+    pool = total_new
+    rate = round(r / pool * 100, 2) if pool > 0 else None
+    records.append({
+        'Order_Month': m,
+        'New_Customers': n,
+        'Legacy_Pool': pool,
+        'Returning_Customers': r,
+        'Retention_Rate_Pct': rate
+    })
+    total_new += n
+ 
+result_df = pd.DataFrame(records)
+result_df.to_sql('monthly_retention_rate', conn, if_exists='replace', index=False)
+print(f"Successfully added {len(records)} rows into 'monthly_retention_rate' table!")
+
 
 # 7. Commit changes and close the connection
 conn.commit()
