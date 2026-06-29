@@ -7,9 +7,8 @@ from labelling import label_tuples_from_csv, add_label_header_tuple
 
 from queries import *
 
-# orders_filename = 'Tất cả đơn hàng-2026-06-01-07_52.xlsx'
-orders_filename = 'Tất cả đơn hàng-2026-06-18-16_39.xlsx'
-output_filename = 'data2.db'
+orders_filename = 'Tất cả đơn hàng-2026-06-01-07_52.xlsx'
+output_filename = 'data.db'
 orders_active_sheet = 'OrderSKUList'
 
 # product_labels_filename = 'Product_Additional_Labels - Product_AddtionalLabels_Labels.csv'
@@ -92,7 +91,6 @@ cursor.execute(UPDATE_TOTAL_CUSTOMERS_TABLE_WITH_SWITCHINGTIME_COL)
 cursor.execute(PRE_UPDATE_TOTAL_CUSTOMERS_TABLE_WITH_DAYTOSWITCH_COL)
 cursor.execute(UPDATE_TOTAL_CUSTOMERS_TABLE_WITH_DAYTOSWITCH_COL)
 cursor.execute(CREATE_LOYAL_SWITCHING_CUSTOMERS_FILTER_TABLE)
-cursor.execute(CREATE_FUNNELGROUP_PIVOT_TABLE)
 
 cursor.execute("SELECT * FROM total_customers_data")
 total_customers_data = cursor.fetchall()
@@ -131,6 +129,16 @@ cursor.execute(CREATE_PIVOT_MONTHLY_CUSTOMERS_ACQUISITION)
 cursor.execute("SELECT * FROM pivot_monthly_customers_acquisition")
 pivot_monthly_customers_acquisition = cursor.fetchall()
 print(f"Successfully added {len(pivot_monthly_customers_acquisition)} rows into 'pivot_monthly_customers_acquisition' table!")
+
+### --------------------------------------------- ###
+### ----------- SWITCHING TABLE ----------- ###
+### --------------------------------------------- ###
+cursor.execute(CREATE_SWITCH_TOTAL_SWITCHING_STATUS)
+cursor.execute(CREATE_SWITCH_MONTHLY_SWITCHING_STATUS_LOYAL)
+cursor.execute(CREATE_TOTAL_FUNNEL_GROUP_PIVOT_TABLE)
+cursor.execute(CREATE_SWITCH_MONTHLY_FUNNEL_GROUP)
+cursor.execute(CREATE_SWITCH_MONTHLY_FUNNEL_GROUP_SWITCHER)
+print("Ran all switching table generators")
 
 ### ------------------------------------------- ###
 ### ----------- OTHERS PIVOT TABLES ----------- ###

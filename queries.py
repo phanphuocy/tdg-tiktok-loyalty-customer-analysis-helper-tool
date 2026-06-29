@@ -224,21 +224,6 @@ CREATE_LOYAL_SWITCHING_CUSTOMERS_FILTER_TABLE = """
     ORDER BY Total_Customer_Spending DESC;
 """
 
-CREATE_FUNNELGROUP_PIVOT_TABLE = """
-    -- How many days until customer to switch, by each funnel group?
-    CREATE TABLE pivot_funnelgroup AS 
-       SELECT Funnel_Group, Switching_Status, Loyalty_Tier, 
-		COUNT(Buyer_Username) AS Num_Of_Customers, ROUND(AVG(Days_To_Switch), 2) AS Avg_Days_To_Switch, 
-        ROUND(AVG(Total_Customer_Spending), 0) AS Avg_Customer_Value,
-		ROUND(AVG(Average_Purchase_Value), 0) AS Avg_Purchase_Value,
-		ROUND(AVG(Num_of_Orders), 1) AS Avg_Num_Of_Orders
-    FROM total_customers_data
-    WHERE Loyalty_Tier = 'Regular / Loyal'
-    GROUP BY Funnel_Group
-    ORDER BY COUNT(Buyer_Username) DESC;
-"""
-
-
 PRE_CREATE_PIVOT_LOYALTY_TABLE = """
     --sql
     DROP TABLE IF EXISTS total_customers_loyalty;
@@ -453,4 +438,69 @@ CREATE_PIVOT_MONTHLY_PRODUCTS = """
         t1.Month_Year = t2.Month_Year
         AND t1.Product_SKU_Name = t2.Product_SKU_Name
         AND t1.Product_Variant = t2.Product_Variant;
+"""
+
+CREATE_SWITCH_TOTAL_SWITCHING_STATUS = """
+    ---sql
+    CREATE TABLE switch_total_switching_status AS
+    SELECT 
+        Switching_Status,
+        COUNT(*) AS Num_of_Customers,
+        ROUND(COUNT(*) * 100.0 / SUM(COUNT(Buyer_Username)) OVER(), 2) AS Pct_Num_Of_Customers
+    FROM total_customers_data
+    WHERE Loyalty_Tier = 'Regular / Loyal'
+    GROUP BY Switching_Status;
+"""
+
+CREATE_SWITCH_MONTHLY_SWITCHING_STATUS_LOYAL = """
+    ---sql
+    CREATE TABLE switch_monthly_switching_status_loyal AS
+    SELECT 
+        SUBSTR(First_Seen, 1, 7) AS Month,
+        Switching_Status,
+        COUNT(Buyer_Username) AS Num_of_Customers
+    FROM total_customers_data
+    WHERE Loyalty_Tier = 'Regular / Loyal'
+    GROUP BY SUBSTR(First_Seen, 1, 7), Switching_Status;
+"""
+
+CREATE_TOTAL_FUNNEL_GROUP_PIVOT_TABLE = """
+    -- How many days until customer to switch, by each funnel group?
+    CREATE TABLE switch_total_funnel_group AS 
+        SELECT Funnel_Group, Switching_Status, Loyalty_Tier, 
+            COUNT(Buyer_Username) AS Num_Of_Customers, ROUND(AVG(Days_To_Switch), 2) AS Avg_Days_To_Switch, 
+            ROUND(AVG(Total_Customer_Spending), 0) AS Avg_Customer_Value,
+            ROUND(AVG(Average_Purchase_Value), 0) AS Avg_Purchase_Value,
+            ROUND(AVG(Num_Of_Orders), 2) AS Avg_Num_Of_Orders,
+            ROUND(AVG(Num_Of_Canceled_Orders), 2) AS Avg_Num_of_Canceled_Orders,
+            ROUND(AVG(Retention_Time_Period), 2) AS Avg_Retention_Time_Period,
+            ROUND(SUM(Retention_Time_Period) / (SUM(Num_of_Orders) - SUM(Num_of_Canceled_Orders)), 2) AS Avg_Days_Between_Noncanceled_Purchases
+        FROM total_customers_data
+        WHERE Loyalty_Tier = 'Regular / Loyal'
+        GROUP BY Funnel_Group
+        ORDER BY COUNT(Buyer_Username) DESC;
+"""
+
+CREATE_SWITCH_MONTHLY_FUNNEL_GROUP = """
+    ---sql
+    CREATE TABLE switch_monthly_funnel_group AS
+    SELECT 
+        SUBSTR(First_Seen, 1, 7) AS Month,
+        Funnel_Group,
+        COUNT(*) AS Num_of_Customers
+    FROM total_customers_data
+    WHERE Loyalty_Tier = 'Regular / Loyal'
+    GROUP BY SUBSTR(First_Seen, 1, 7), Funnel_Group;
+"""
+
+CREATE_SWITCH_MONTHLY_FUNNEL_GROUP_SWITCHER = """
+    ---sql
+    CREATE TABLE switch_monthly_funnel_group_switcher AS
+    SELECT 
+        SUBSTR(First_Seen, 1, 7) AS Month,
+        Funnel_Group,
+        COUNT(*) AS Num_of_Customers
+    FROM total_customers_data
+    WHERE Loyalty_Tier = 'Regular / Loyal' AND Switching_Status = 'Switcher'
+    GROUP BY SUBSTR(First_Seen, 1, 7), Funnel_Group;
 """
