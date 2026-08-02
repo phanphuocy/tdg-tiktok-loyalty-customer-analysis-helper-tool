@@ -1,8 +1,0 @@
-Funnel_Group,Switching_Status,Loyalty_Tier,Num_Of_Customers,Avg_Days_To_Switch,Avg_Customer_Value,Avg_Purchase_Value,Avg_Num_Of_Orders,Avg_Num_of_Canceled_Orders,Avg_Retention_Time_Period,Avg_Days_Between_Noncanceled_Purchases
-Only with Kinka,Non-switcher,Regular / Loyal,195,,263060.0,100786.0,2.57,0.43,21.8,10.17
-Only with Revy,Non-switcher,Regular / Loyal,23,,544453.0,188299.0,3.13,0.39,35.27,12.88
-Start with Revy,Switcher,Regular / Loyal,19,29.08,1097019.0,146852.0,6.74,1.16,68.64,12.3
-Start with Kinka,Switcher,Regular / Loyal,19,20.48,546190.0,134974.0,4.32,0.21,39.84,9.7
-Start with SiMee,Switcher,Regular / Loyal,13,50.98,743274.0,182139.0,4.69,0.54,98.61,23.74
-Start with Revy and SiMee,Switcher,Regular / Loyal,2,80.95,2130552.0,182753.0,18.5,3.0,145.58,9.39
-Start with Kinka and Revy,Non-switcher,Regular / Loyal,1,,388921.0,194460.0,2.0,0.0,2.65,1.32
