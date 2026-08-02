@@ -429,7 +429,8 @@ CREATE_PIVOT_MONTHLY_PRODUCTS = """
             Product_Variant,
             COALESCE(SUM(Quantity), 0) AS Nonaffiliated_Num_Of_Unit_Sold,
             ROUND(COALESCE(SUM(Pack_Size), 0), 2) AS Nonaffiliated_Volume_Sold,
-            ROUND(AVG(SKU_Subtotal_After_Discount / Quantity), 0) AS Nonaffiliated_Avg_Price
+            -- ROUND(AVG(SKU_Subtotal_After_Discount / Quantity), 0) AS Nonaffiliated_Avg_Price
+            ROUND(SUM(SKU_Subtotal_After_Discount) / SUM(Quantity), 0) AS Nonaffiliated_Avg_Price
         FROM excel_data
         WHERE Category != 'Quà tặng' AND Normal_Or_Pre_order IS NOT NULL
         GROUP BY Month_Year, Product_SKU_Name, Category, Product_Variant

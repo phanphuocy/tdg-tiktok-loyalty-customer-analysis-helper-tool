@@ -7,14 +7,20 @@ from labelling import label_tuples_from_csv, add_label_header_tuple
 
 from queries import *
 
-orders_filename = 'Tất cả đơn hàng-2026-06-01-07_52.xlsx'
-output_filename = 'data.db'
+# orders_filename = 'Tất cả đơn hàng-2026-06-01-07_52.xlsx'
+orders_filename = 'Tất cả đơn hàng-2026-08-01-13_45.xlsx'
+# output_filename = 'data.db'
+output_filename = 'data_th8.db'
 orders_active_sheet = 'OrderSKUList'
 
 # product_labels_filename = 'Product_Additional_Labels - Product_AddtionalLabels_Labels.csv'
-product_labels_filename = 'Product_Additional_Labels2 - Product_AddtionalLabels_Labels2.csv'
+# product_labels_filename = 'Product_Additional_Labels2 - Product_AddtionalLabels_Labels2.csv'
+# product_labels_filename = 'Product_Additional_Labels2 - Product_AddtionalLabels_Labels3.csv'
+product_labels_filename = 'Product_Additional_Labels3 - roduct_AddtionalLabels_Labels4.csv'
 # product_labels_sheet = 'Product_AddtionalLabels_Labels'
-product_labels_sheet = 'Product_AddtionalLabels_Labels2'
+# product_labels_sheet = 'Product_AddtionalLabels_Labels2'
+# product_labels_sheet = 'Product_AddtionalLabels_Labels3'
+product_labels_sheet = 'Product_AddtionalLabels_Labels4'
 
 orders_workbook = load_workbook(filename=orders_filename)
 orders_sheet = orders_workbook[orders_active_sheet]

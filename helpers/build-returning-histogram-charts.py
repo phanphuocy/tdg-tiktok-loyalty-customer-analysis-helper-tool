@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 conn = sqlite3.connect('data.db')
+# conn = sqlite3.connect('data_th7.db')
 
 query = """--sql
 SELECT * FROM monthly_customers_data 
